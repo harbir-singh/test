@@ -1,0 +1,41 @@
+{
+  "name" : "job",
+  "description" : "",
+  "role" : "arn:aws:iam::696310058248:role/glue",
+  "executionProperty" : {
+    "maxConcurrentRuns" : 1
+  },
+  "command" : {
+    "name" : "glueetl",
+    "scriptLocation" : "s3://aws-glue-assets-696310058248-us-east-2/scripts/job.py",
+    "pythonVersion" : "3"
+  },
+  "defaultArguments" : {
+    "--class" : "GlueApp",
+    "--enable-metrics" : "true",
+    "--enable-spark-ui" : "true",
+    "--extra-py-files" : "s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_common.py,s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_explode.py",
+    "--spark-event-logs-path" : "s3://aws-glue-assets-696310058248-us-east-2/sparkHistoryLogs/",
+    "--enable-job-insights" : "false",
+    "--enable-glue-datacatalog" : "true",
+    "--enable-continuous-cloudwatch-log" : "true",
+    "--job-bookmark-option" : "job-bookmark-disable",
+    "--job-language" : "python",
+    "--TempDir" : "s3://aws-glue-assets-696310058248-us-east-2/temporary/"
+  },
+  "maxRetries" : 0,
+  "allocatedCapacity" : 2,
+  "timeout" : 2880,
+  "maxCapacity" : 2.0,
+  "glueVersion" : "4.0",
+  "numberOfWorkers" : 2,
+  "workerType" : "G.1X",
+  "executionClass" : "STANDARD",
+  "codeGenConfigurationNodes" : "{\"node-1692146991821\":{\"Join\":{\"Columns\":[{\"From\":\"node-1692146933937\",\"Keys\":[[\"segment_id\"]]},{\"From\":\"node-1692148500653\",\"Keys\":[[\"segment_id\"]]}],\"Inputs\":[\"node-1692146933937\",\"node-1692148500653\"],\"JoinType\":\"outer\",\"Name\":\"Join\"}},\"node-1692148552138\":{\"DropFields\":{\"Inputs\":[\"node-1692146991821\"],\"Name\":\"Drop Fields\",\"Paths\":[[\"segment_id\"]]}},\"node-1692148500653\":{\"DropFields\":{\"Inputs\":[\"node-1692146351131\"],\"Name\":\"Drop Fields\",\"Paths\":[[\"segment_ids\"]]}},\"node-1692146351131\":{\"DynamicTransform\":{\"FunctionName\":\"gs_explode\",\"Inputs\":[\"node-1\"],\"Name\":\"Explode Array Or Map Into Rows\",\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"segment_id\",\"Type\":\"string\"},{\"Name\":\"luid\",\"Type\":\"string\"},{\"Name\":\"segment_ids\",\"Type\":\"array<string>\"}]}],\"Parameters\":[{\"IsOptional\":false,\"Name\":\"colName\",\"Type\":\"str\",\"Value\":[\"segment_ids\"]},{\"IsOptional\":false,\"Name\":\"newCol\",\"Type\":\"str\",\"Value\":[\"segment_id\"]},{\"IsOptional\":true,\"Name\":\"outer\",\"Type\":\"bool\",\"Value\":[\"false\"]}],\"Path\":\"s3://aws-glue-studio-transforms-251189692203-prod-us-east-2/gs_explode.py\",\"TransformName\":\"gs_explode\",\"Version\":\"1.0.0\"}},\"node-1\":{\"S3JsonSource\":{\"AdditionalOptions\":{\"EnableSamplePath\":false,\"SamplePath\":\"s3://harbir-taxonomy-drop-location/data.jsonl.gz\"},\"Exclusions\":[],\"JsonPath\":\"\",\"Multiline\":false,\"Name\":\"S3 bucket\",\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"luid\",\"Type\":\"string\"},{\"Name\":\"segment_ids\",\"Type\":\"array<string>\"}]}],\"Paths\":[\"s3://harbir-taxonomy-drop-location/data.jsonl.gz\"],\"Recurse\":true}},\"node-3\":{\"S3DirectTarget\":{\"Compression\":\"none\",\"Format\":\"json\",\"Inputs\":[\"node-1692149415205\"],\"Name\":\"S3 bucket\",\"PartitionKeys\":[],\"Path\":\"s3://harbir-taxonomy-drop-location\",\"SchemaChangePolicy\":{\"EnableUpdateCatalog\":false}}},\"node-1692149415205\":{\"SparkSQL\":{\"Inputs\":[\"node-1692148552138\"],\"Name\":\"SQL Query\",\"SqlAliases\":[{\"Alias\":\"myDataSource\",\"From\":\"node-1692148552138\"}],\"SqlQuery\":\"select luid,collect_set(audienceDefinitionId) as audienceDefinitionIds from myDataSource\\ngroup by luid\"}},\"node-1692146933937\":{\"S3JsonSource\":{\"AdditionalOptions\":{\"EnableSamplePath\":false,\"SamplePath\":\"s3://harbir-taxonomy-drop-location/mapping.jsonl\"},\"Exclusions\":[],\"JsonPath\":\"\",\"Multiline\":false,\"Name\":\"Amazon S3\",\"OutputSchemas\":[{\"Columns\":[{\"Name\":\"segment_id\",\"Type\":\"string\"},{\"Name\":\"audienceDefinitionId\",\"Type\":\"string\"}]}],\"Paths\":[\"s3://harbir-taxonomy-drop-location/mapping.jsonl\"],\"Recurse\":true}}}",
+  "sourceControlDetails" : {
+    "provider" : "GITHUB",
+    "repository" : "test",
+    "branch" : "main",
+    "folder" : "job"
+  }
+}
